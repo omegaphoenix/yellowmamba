@@ -5,10 +5,11 @@
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
  * within 30 seconds.
  */
-Player::Player(Side side) {
+Player::Player(Side side) 
+{
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-
+    Board b = Board();
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
      * precalculating things, etc.) However, remember that you will only have
@@ -19,7 +20,8 @@ Player::Player(Side side) {
 /*
  * Destructor for the player.
  */
-Player::~Player() {
+Player::~Player() 
+{
 }
 
 /*
@@ -34,10 +36,27 @@ Player::~Player() {
  * The move returned must be legal; if there are no valid moves for your side,
  * return NULL.
  */
-Move *Player::doMove(Move *opponentsMove, int msLeft) {
+Move *Player::doMove(Move *opponentsMove, int msLeft) 
+{
+    if (true) //change to testingMinimax once we have a better method
+    {
+        return doMinimax(opponentsMove, msLeft);
+    }
     /* 
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
+    return NULL;
+}
+Move *Player::doMinimax(Move *opponentsMove, int msLeft)
+{
+    return NULL;
+}
+Move *Player::random(Move *opponentsMove, int msLeft)
+{
+    return NULL;
+}
+Move *Player::heuristic(Move *opponentsMove, int msLeft)
+{
     return NULL;
 }
