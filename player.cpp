@@ -1,5 +1,7 @@
 #include "player.h"
-
+#include "stdio.h"
+Board b;
+Side s;
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
@@ -9,7 +11,8 @@ Player::Player(Side side)
 {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    Board b = Board();
+    b = Board();
+    s = side;
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
      * precalculating things, etc.) However, remember that you will only have
@@ -40,13 +43,13 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 {
     if (true) //change to testingMinimax once we have a better method
     {
-        return doMinimax(opponentsMove, msLeft);
+        return random(opponentsMove, msLeft);
     }
     /* 
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-    return NULL;
+    //return NULL;
 }
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
 {
@@ -54,6 +57,19 @@ Move *Player::doMinimax(Move *opponentsMove, int msLeft)
 }
 Move *Player::random(Move *opponentsMove, int msLeft)
 {
+    doMove(opponentsMove,s+1);    
+    for (int i = 0; i < 8; i++) 
+    {
+        for (int j = 0; j < 8; j++) 
+        {
+            Move *move = new Move(i, j);
+            if (b.checkMove(move, s))
+            {
+                b.doMove(move,s);
+                return move;
+            }
+        }
+    }
     return NULL;
 }
 Move *Player::heuristic(Move *opponentsMove, int msLeft)
