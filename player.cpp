@@ -1,6 +1,6 @@
 #include "player.h"
 #include "stdio.h"
-Board b;
+Board *b;
 Side s;
 /*
  * Constructor for the player; initialize everything here. The side your AI is
@@ -11,7 +11,7 @@ Player::Player(Side side)
 {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    b = Board();
+    b = new Board();
     s = side;
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
@@ -41,48 +41,141 @@ Player::~Player()
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) 
 {
-    if (true) //change to testingMinimax once we have a better method
+    if (testingMinimax)
     {
-        //fprintf(stderr,"%d,%d,\n",0,0);
-        return heuristic(opponentsMove, msLeft);
+        char data[] = 
+        {'a','a','a','a','a','a','a','a',
+        'a','a','a','a','a','a','a','a',
+        'a','b','a','a','a','a','a','a',
+        'b','w','b','b','b','b','a','a',
+        'a','a','a','a','a','a','a','a',
+        'a','a','a','a','a','a','a','a',
+        'a','a','a','a','a','a','a','a',
+        'a','a','a','a','a','a','a','a'};
+        b->setBoard(data);
+        return doMinimax(opponentsMove, msLeft);
     }
-    /* 
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */ 
-    return NULL;
+    return doMinimax(opponentsMove,msLeft);
 }
+
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
 {
-    return NULL;
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        b->doMove(opponentsMove,other);
+    }
+    std::vector<Move*> posMoves = getPossibleMoves(b,s);
+    if(posMoves.empty())
+    {
+        return NULL;
+    }
+    if(posMoves.size()==1)
+    {
+        b->doMove(posMoves[0],s);
+        return posMoves[0];
+    }
+    std::vector<int> maximumMin;
+    std::vector<Move*> oppPosMoves;
+    for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+    {
+        Board *c = b->copy();
+        c->doMove(*it,s);
+        oppPosMoves = getPossibleMoves(c,other);
+        if(oppPosMoves.empty())
+        {
+            maximumMin.push_back(score(c));
+        }
+        else
+        {
+            int min = 65;
+            for(std::vector<Move*>::iterator iter = oppPosMoves.begin(); iter!=oppPosMoves.end(); ++iter)
+            {
+                Board *d = c->copy();
+                d->doMove(*iter,other);
+                int temp = score(d);
+                if(temp<min)
+                {
+                    min = temp;
+                }
+            }
+            maximumMin.push_back(min);
+        }
+    }
+    Move *ans = posMoves[0];
+    int max = maximumMin[0];
+    int i = 0;
+    for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+    {
+        if(maximumMin[i]>max)
+        {
+            ans = *it;
+            max = maximumMin[i];
+        }
+        i++;
+    }
+    b->doMove(ans,s);
+    return ans;
 }
+
+int Player::score(Board *boardState)
+{
+    int ans = boardState->countWhite() - boardState->countBlack();
+    if(s == WHITE)
+    {
+        return ans;
+    }
+    else
+    {
+        return -1*ans;
+    }
+}
+
+std::vector<Move*> Player::getPossibleMoves(Board *boardState,Side side)
+{
+    std::vector<Move*> posMoves = std::vector<Move*>();
+    for (int i = 0; i < 8; i++) 
+    {
+        for (int j = 0; j < 8; j++) 
+        {
+            Move *move = new Move(i, j);
+            if (boardState->checkMove(move, side))
+            {
+                posMoves.push_back(move);
+            }
+        }
+    }
+    return posMoves;
+}
+
 Move *Player::random(Move *opponentsMove, int msLeft)
 {
     Side other = (s == BLACK) ? WHITE : BLACK;
     if(opponentsMove!=NULL)
     {
-        b.doMove(opponentsMove,other);
+        b->doMove(opponentsMove,other);
     }
     for (int i = 0; i < 8; i++) 
     {
         for (int j = 0; j < 8; j++) 
         {
             Move *move = new Move(i, j);
-            if (b.checkMove(move, s))
+            if (b->checkMove(move, s))
             {
-                b.doMove(move,s);
+                b->doMove(move,s);
                 return move;
             }
         }
     }
     return NULL;
 }
+
 Move *Player::heuristic(Move *opponentsMove, int msLeft)
 {
     Side other = (s == BLACK) ? WHITE : BLACK;
     if(opponentsMove!=NULL)
     {
-        b.doMove(opponentsMove,other);
+        b->doMove(opponentsMove,other);
     }
     int score = -1000;
     Move *move = NULL;
@@ -90,11 +183,10 @@ Move *Player::heuristic(Move *opponentsMove, int msLeft)
     {
         for (int j = 0; j < 8; j++) 
         {
-            fprintf(stderr,"%d,%d,\n",i,j);
             Move *temp = new Move(i, j);
-            if (b.checkMove(temp, s))
+            if (b->checkMove(temp, s))
             {
-                Board *c = b.copy();
+                Board *c = b->copy();
                 c->doMove(temp,s);
                 if (s == BLACK)
                 {
@@ -113,10 +205,9 @@ Move *Player::heuristic(Move *opponentsMove, int msLeft)
                     }
                 }
                 delete c;
-                fprintf(stderr,"%d,%d\n",i,j);
             }
         }
     }
-    b.doMove(move, s);
+    b->doMove(move, s);
     return move;
 }
