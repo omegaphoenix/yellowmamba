@@ -67,12 +67,10 @@ Move *Player::random(Move *opponentsMove, int msLeft)
     {
         for (int j = 0; j < 8; j++) 
         {
-            fprintf(stderr,"%d,%d,\n",i,j);
             Move *move = new Move(i, j);
             if (b.checkMove(move, s))
             {
                 b.doMove(move,s);
-                fprintf(stderr,"%d,%d\n",i,j);
                 return move;
             }
         }
