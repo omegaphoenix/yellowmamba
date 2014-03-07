@@ -43,13 +43,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 {
     if (true) //change to testingMinimax once we have a better method
     {
+        //fprintf(stderr,"%d,%d,\n",0,0);
         return random(opponentsMove, msLeft);
     }
     /* 
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-    //return NULL;
+    return NULL;
 }
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
 {
@@ -57,15 +58,23 @@ Move *Player::doMinimax(Move *opponentsMove, int msLeft)
 }
 Move *Player::random(Move *opponentsMove, int msLeft)
 {
-    doMove(opponentsMove,s+1);    
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        fprintf(stderr,"still alive");
+        b.doMove(opponentsMove,other);
+        fprintf(stderr,"not dead");
+    }
     for (int i = 0; i < 8; i++) 
     {
         for (int j = 0; j < 8; j++) 
         {
+            fprintf(stderr,"%d,%d,\n",i,j);
             Move *move = new Move(i, j);
             if (b.checkMove(move, s))
             {
                 b.doMove(move,s);
+                fprintf(stderr,"%d,%d\n",i,j);
                 return move;
             }
         }
