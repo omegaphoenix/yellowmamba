@@ -44,7 +44,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     if (true) //change to testingMinimax once we have a better method
     {
         //fprintf(stderr,"%d,%d,\n",0,0);
-        return random(opponentsMove, msLeft);
+        return heuristic(opponentsMove, msLeft);
     }
     /* 
      * TODO: Implement how moves your AI should play here. You should first
@@ -61,9 +61,7 @@ Move *Player::random(Move *opponentsMove, int msLeft)
     Side other = (s == BLACK) ? WHITE : BLACK;
     if(opponentsMove!=NULL)
     {
-        fprintf(stderr,"still alive");
         b.doMove(opponentsMove,other);
-        fprintf(stderr,"not dead");
     }
     for (int i = 0; i < 8; i++) 
     {
@@ -83,5 +81,44 @@ Move *Player::random(Move *opponentsMove, int msLeft)
 }
 Move *Player::heuristic(Move *opponentsMove, int msLeft)
 {
-    return NULL;
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        b.doMove(opponentsMove,other);
+    }
+    int score = -1000;
+    Move *move = NULL;
+    for (int i = 0; i < 8; i++) 
+    {
+        for (int j = 0; j < 8; j++) 
+        {
+            fprintf(stderr,"%d,%d,\n",i,j);
+            Move *temp = new Move(i, j);
+            if (b.checkMove(temp, s))
+            {
+                Board *c = b.copy();
+                c->doMove(temp,s);
+                if (s == BLACK)
+                {
+                    if ( c->countBlack() - c->countWhite() > score)
+                    {
+                        score = c->countBlack() - c->countWhite();
+                        move = temp;
+                    } 
+                }
+                else
+                {
+                    if (c->countWhite() - c->countBlack() > score)
+                    {
+                        score = c->countWhite() - c->countBlack();
+                        move = temp;
+                    }
+                }
+                delete c;
+                fprintf(stderr,"%d,%d\n",i,j);
+            }
+        }
+    }
+    b.doMove(move, s);
+    return move;
 }
