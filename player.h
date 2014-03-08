@@ -14,6 +14,9 @@ public:
     ~Player();
     
     Move *doMove(Move *opponentsMove, int msLeft);
+    Move *mamba1(Move *opponentsMove, int msLeft);
+    double recursiveMinMax(Board *b, int depth, bool maximizing);
+    double value(Board *boardState);
     Move *doMinimax(Move *opponentsMove, int msLeft);
     int score(Board *boardState);
     std::vector<Move*> getPossibleMoves(Board *boardState, Side side);

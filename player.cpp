@@ -55,7 +55,120 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         b->setBoard(data);
         return doMinimax(opponentsMove, msLeft);
     }
-    return doMinimax(opponentsMove,msLeft);
+    return mamba1(opponentsMove, msLeft);
+}
+
+Move *Player::mamba1(Move *opponentsMove, int msLeft)
+{
+    int depth = 4;
+    bool maximizing; 
+    double bestValue;
+    if (s == WHITE)
+    {
+        maximizing = true;
+        bestValue = -100000;
+    }
+    else
+    {
+        maximizing = false;
+        bestValue = 100000;
+    }
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        b->doMove(opponentsMove,other);
+    }
+    std::vector<Move*> posMoves = getPossibleMoves(b,s);
+    if(posMoves.empty())
+    {
+        return NULL;
+    }
+    if(posMoves.size() == 1)
+    {
+        b->doMove(posMoves[0], s);
+        return posMoves[0];
+    }
+    Move *move;
+    for(std::vector<Move*>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
+    {
+        Board *c = b->copy();
+        c->doMove(*it, s);
+        double val = recursiveMinMax(c, depth, not maximizing);
+        if (maximizing) 
+        {
+            if (val > bestValue)
+            {
+                bestValue = val;
+                move = *it; 
+            }
+        }
+        else
+        {
+            if (val < bestValue)
+            {
+                bestValue = val;
+                move = *it;
+            }
+        }
+    }
+    b->doMove(move, s);
+    return move;
+}
+
+double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
+{
+    if (depth == 0)
+    {
+        return value(b); 
+    }
+    if (maximizing) 
+    {
+        std::vector<Move*> posMoves = getPossibleMoves(b, WHITE); 
+        if (posMoves.empty())
+        {
+            return value(b);
+        }
+        double bestValue = -100000;
+        double val;
+        for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+        {
+            Board *c = b->copy();
+            c->doMove(*it, WHITE);
+            val = recursiveMinMax(c, depth - 1, false);
+            if (val > bestValue)
+            {
+                bestValue = val;
+            }
+        }
+        return bestValue;
+    }
+    else
+    {
+        std::vector<Move*> posMoves = getPossibleMoves(b, BLACK);
+        if (posMoves.empty())
+        {
+            return value(b);
+        } 
+        double bestValue = 100000;
+        double val;
+        for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+        {
+            Board *c = b->copy();
+            c->doMove(*it, BLACK);
+            val = recursiveMinMax(c, depth - 1, true);
+            if (val < bestValue)
+            {
+                bestValue = val;
+            }
+        }
+        return bestValue;
+    }
+}
+
+double Player::value(Board *boardState)
+{
+    double ans = boardState->countWhite() - boardState->countBlack();
+    return ans;
 }
 
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
