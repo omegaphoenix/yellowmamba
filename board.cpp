@@ -286,8 +286,31 @@ int Board::whiteCloseCorner()
     return bitCloseCorner(taken) - black;
 }
 
+int Board::bitEdges(bitset<64> bit)
+{
+    int ans = 0;
+    for (int i = 2; i < 5; ++i)
+    {
+        ans += bit[i + 8 * 0] + bit[i + 8 * 7];
+    }
+    for (int i = 2; i < 5; ++i)
+    {
+        ans += bit[0 + 8 * i] + bit[7 + 8 * i];
+    }
+    return ans;  
+}
 
+int Board::blackEdges()
+{
+    int ans = bitEdges(black);
+    return ans;
+} 
 
+int Board::whiteEdges()
+{
+    int black = blackEdges();
+    return bitEdges(taken) - black;
+}
 
 
 /*

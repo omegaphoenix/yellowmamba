@@ -129,7 +129,7 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
             if (oppMoves.empty())
             {
-                return 10000 * b->countWhite() - b->countBlack();
+                return 10000 * (b->countWhite() - b->countBlack());
             }
             return value(b);
         }
@@ -144,6 +144,8 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             {
                 bestValue = val;
             }
+            delete c;
+            delete *it;
         }
         return bestValue;
     }
@@ -155,7 +157,7 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
             if (oppMoves.empty())
             {
-                return 10000 * b->countWhite() - b->countBlack();
+                return 10000 * (b->countWhite() - b->countBlack());
             }
             return value(b);
         } 
@@ -170,6 +172,8 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             {
                 bestValue = val;
             }
+            delete c;
+            delete *it;
         }
         return bestValue;
     }
@@ -196,7 +200,9 @@ double Player::value(Board *boardState)
     W = boardState->whiteCloseCorner(); 
     B = boardState->blackCloseCorner();
     double cornerClose = 12.5 * (B - W);
-
+    W = boardState->whiteEdges();
+    B = boardState->blackEdges();
+    double edges = 12.5 * (W - B);
 // NOTE: the mobility heuristic greatly slows computation and leads to a malloc error 
 /*   std::vector<Move*> blackMoves = getPossibleMoves(boardState, BLACK); 
     std::vector<Move*> whiteMoves = getPossibleMoves(boardState, WHITE);
@@ -217,7 +223,7 @@ double Player::value(Board *boardState)
     }
 */
 
-    return 10 * pieceDif + 801.724 * corners + 382.026 * cornerClose; 
+    return 10 * pieceDif + 801.724 * corners + 382.026 * cornerClose + 382 * edges; 
 // + 78.922 * mobility;
 }
 

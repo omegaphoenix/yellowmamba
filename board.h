@@ -34,6 +34,9 @@ public:
     int bitCloseCorner(bitset<64> bit); 
     int blackCloseCorner();
     int whiteCloseCorner();
+    int bitEdges(bitset<64> bit);
+    int blackEdges();
+    int whiteEdges();
     void setBoard(char data[]);
 };
 
