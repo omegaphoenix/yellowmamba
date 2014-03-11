@@ -126,6 +126,11 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
         std::vector<Move*> posMoves = getPossibleMoves(b, WHITE); 
         if (posMoves.empty())
         {
+            std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
+            if (oppMoves.empty())
+            {
+                return 10000 * b->countWhite() - b->countBlack();
+            }
             return value(b);
         }
         double bestValue = -100000;
@@ -147,6 +152,11 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
         std::vector<Move*> posMoves = getPossibleMoves(b, BLACK);
         if (posMoves.empty())
         {
+            std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
+            if (oppMoves.empty())
+            {
+                return 10000 * b->countWhite() - b->countBlack();
+            }
             return value(b);
         } 
         double bestValue = 100000;
@@ -167,8 +177,48 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
 
 double Player::value(Board *boardState)
 {
-    double ans = boardState->countWhite() - boardState->countBlack();
-    return ans;
+    double pieceDif;
+    double W = boardState->countWhite();
+    double B = boardState->countBlack();
+    if (W == B)
+    {
+        pieceDif = 0;
+    }
+    else if( W > B)
+    {
+        pieceDif = 100 * W / (B + W);
+    }
+    else
+    {
+        pieceDif = -100 * B / (B + W);
+    }
+    double corners = 25 * (boardState->whiteCorners() - boardState->blackCorners());
+    W = boardState->whiteCloseCorner(); 
+    B = boardState->blackCloseCorner();
+    double cornerClose = 12.5 * (B - W);
+
+// NOTE: the mobility heuristic greatly slows computation and leads to a malloc error 
+/*   std::vector<Move*> blackMoves = getPossibleMoves(boardState, BLACK); 
+    std::vector<Move*> whiteMoves = getPossibleMoves(boardState, WHITE);
+    B = blackMoves.size();
+    W = whiteMoves.size(); 
+    double mobility;
+    if (W == B)
+    {
+        mobility = 0;
+    }
+    else if (W > B)
+    {
+        mobility = 100 * W / (B + W);
+    }
+    else 
+    {
+        mobility = -100 * B / (B + W);
+    }
+*/
+
+    return 10 * pieceDif + 801.724 * corners + 382.026 * cornerClose; 
+// + 78.922 * mobility;
 }
 
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
