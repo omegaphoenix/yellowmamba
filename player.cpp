@@ -129,7 +129,7 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
             if (oppMoves.empty())
             {
-                return 10000 * (b->countWhite() - b->countBlack());
+                return 1000 * (b->countWhite() - b->countBlack());
             }
             return value(b);
         }
@@ -157,7 +157,7 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
             if (oppMoves.empty())
             {
-                return 10000 * (b->countWhite() - b->countBlack());
+                return 1000 * (b->countWhite() - b->countBlack());
             }
             return value(b);
         } 
