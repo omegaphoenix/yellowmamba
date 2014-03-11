@@ -163,6 +163,157 @@ int Board::countWhite() {
 }
 
 /*
+ *
+ */
+int Board::countCorners(Side side) 
+{
+    return (side == BLACK) ? blackCorners() : whiteCorners();
+}
+
+/*
+ * Current count of black corners.
+ */
+int Board::blackCorners()
+{
+    int ans = 0;
+    if (black[0 + 8 * 0])
+    {
+        ans++;
+    }
+    if (black[0 + 8 * 7])
+    {
+        ans++;
+    }
+    if (black[7 + 8 * 0])
+    {
+        ans++;
+    }
+    if (black[7 + 8 * 7])
+    {
+        ans++;
+    }
+    return ans;
+} 
+
+/*
+ * Current count of white corners.
+ */
+int Board::whiteCorners()
+{
+    int ans = 0;
+    if (taken[0 + 8 * 0])
+    {
+        ans++;
+    }
+    if (taken[0 + 8 * 7])
+    {
+        ans++;
+    }
+    if (taken[7 + 8 * 0])
+    {
+        ans++;
+    }
+    if (taken[7 + 8 * 7])
+    {
+        ans++;
+    }
+    return ans - blackCorners();
+}
+
+int Board::bitCloseCorner(bitset<64> bit)
+{
+    int ans = 0;
+    if (bit[0 + 8 * 1])
+    {
+        ans++;
+    }
+    if (bit[1 + 8 * 0])
+    {
+        ans++;
+    }
+    if (bit[1 + 8 * 1])
+    {
+        ans++;
+    }
+    if (bit[0 + 8 * 6])
+    {
+        ans++;
+    }
+    if (bit[1 + 8 * 6])
+    {
+        ans++;
+    }
+    if (bit[1 + 8 * 7])
+    {
+        ans++;
+    }
+    if (bit[6 + 8 * 0])
+    {
+        ans++;
+    }
+    if (bit[6 + 8 * 1])
+    {
+        ans++;
+    }
+    if (bit[7 + 8 * 1])
+    {
+        ans++;
+    }
+    if (bit[6 + 8 * 6])
+    {
+        ans++;
+    }
+    if (bit[7 + 8 * 6])
+    {
+        ans++;
+    }
+    if (bit[6 + 8 * 7])
+    {
+        ans++;
+    }
+    return ans;
+} 
+
+int Board::blackCloseCorner()
+{
+    int ans = bitCloseCorner(black);
+    return ans;
+}
+
+int Board::whiteCloseCorner()
+{
+    int black = blackCloseCorner();
+    return bitCloseCorner(taken) - black;
+}
+
+int Board::bitEdges(bitset<64> bit)
+{
+    int ans = 0;
+    for (int i = 2; i < 5; ++i)
+    {
+        ans += bit[i + 8 * 0] + bit[i + 8 * 7];
+    }
+    for (int i = 2; i < 5; ++i)
+    {
+        ans += bit[0 + 8 * i] + bit[7 + 8 * i];
+    }
+    return ans;  
+}
+
+int Board::blackEdges()
+{
+    int ans = bitEdges(black);
+    return ans;
+} 
+
+int Board::whiteEdges()
+{
+    int black = blackEdges();
+    return bitEdges(taken) - black;
+}
+
+
+/*
  * Sets the board state given an 8x8 char array where 'w' indicates a white
  * piece and 'b' indicates a black piece. Mainly for testing purposes.
  */

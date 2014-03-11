@@ -28,7 +28,15 @@ public:
     int count(Side side);
     int countBlack();
     int countWhite();
-
+    int countCorners(Side side); 
+    int blackCorners();
+    int whiteCorners();
+    int bitCloseCorner(bitset<64> bit); 
+    int blackCloseCorner();
+    int whiteCloseCorner();
+    int bitEdges(bitset<64> bit);
+    int blackEdges();
+    int whiteEdges();
     void setBoard(char data[]);
 };
 
