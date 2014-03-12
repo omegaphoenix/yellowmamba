@@ -55,12 +55,12 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         b->setBoard(data);
         return doMinimax(opponentsMove, msLeft);
     }
-    return mamba1(opponentsMove, msLeft);
+    return mamba1alphaBeta(opponentsMove, msLeft);
 }
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
 {
-    int depth = 4;
+    int depth = 5;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;
