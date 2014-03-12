@@ -77,9 +77,10 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
     if(posMoves.size() == 1)
     {
         b->doMove(&posMoves[0], s);
-        return &posMoves[0];
+        Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+        return ans;
     }
-    Move *move;
+    Move move(0,0);
     for(std::vector<Move>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
     {
         Board *c = b->copy();
@@ -90,7 +91,7 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val > alpha)
             {
                 alpha = val;
-                move = &(*it); 
+                move = (*it); 
             }
         }
         else
@@ -98,13 +99,14 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val < beta)
             {
                 beta = val;
-                move = &(*it);
+                move = (*it);
             }
         }
         delete c;
     }
-    b->doMove(move, s);
-    return move;
+    Move *ans = new Move(move.x,move.y);
+    b->doMove(ans, s);
+    return ans;
 }
 
 double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, double beta)
@@ -125,8 +127,6 @@ double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, dou
             }
             return value(b);
         }
-        //double alpha = -99999;
-        //double beta = 99999;
         double val;
         for(std::vector<Move>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
         {
@@ -143,7 +143,6 @@ double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, dou
                 }
             }
             delete c;
-            //delete *it;
         }
         return alpha;
     }
@@ -159,7 +158,6 @@ double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, dou
             }
             return value(b);
         } 
-        //double bestValue = 100000;
         double val;
         for(std::vector<Move>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
         {
@@ -176,7 +174,6 @@ double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, dou
                 }
             }
             delete c;
-            //delete *it;
         }
         return beta;
     }
