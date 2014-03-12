@@ -14,7 +14,9 @@ public:
     ~Player();
     
     Move *doMove(Move *opponentsMove, int msLeft);
+    double alphaBeta(Board *b, int depth, bool maximizing, double alpha, double beta);
     Move *mamba1(Move *opponentsMove, int msLeft);
+    Move *mamba1alphaBeta(Move *opponentsMove, int msLeft);
     double recursiveMinMax(Board *b, int depth, bool maximizing);
     double value(Board *boardState);
     Move *doMinimax(Move *opponentsMove, int msLeft);
