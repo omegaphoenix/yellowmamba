@@ -90,7 +90,7 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val > alpha)
             {
                 alpha = val;
-                move = it; 
+                move = &(*it); 
             }
         }
         else
@@ -98,7 +98,7 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val < beta)
             {
                 beta = val;
-                move = it;
+                move = &(*it);
             }
         }
         delete c;
