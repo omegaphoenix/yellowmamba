@@ -21,7 +21,7 @@ public:
     double value(Board *boardState);
     Move *doMinimax(Move *opponentsMove, int msLeft);
     int score(Board *boardState);
-    std::vector<Move*> getPossibleMoves(Board *boardState, Side side);
+    std::vector<Move> getPossibleMoves(Board *boardState, Side side);
     Move *random(Move *opponentsMove, int msLeft);
     Move *heuristic(Move *opponentsMove, int msLeft);
 
