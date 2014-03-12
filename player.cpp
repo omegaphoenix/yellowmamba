@@ -60,7 +60,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
 {
-    int depth = 5;
+    int depth = 8;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;
@@ -69,28 +69,29 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
     {
         b->doMove(opponentsMove,other);
     }
-    std::vector<Move*> posMoves = getPossibleMoves(b,s);
+    std::vector<Move> posMoves = getPossibleMoves(b,s);
     if(posMoves.empty())
     {
         return NULL;
     }
     if(posMoves.size() == 1)
     {
-        b->doMove(posMoves[0], s);
-        return posMoves[0];
+        b->doMove(&posMoves[0], s);
+        Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+        return ans;
     }
-    Move *move;
-    for(std::vector<Move*>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
+    Move move(0,0);
+    for(std::vector<Move>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
     {
         Board *c = b->copy();
-        c->doMove(*it, s);
+        c->doMove(&(*it), s);
         double val = alphaBeta(c, depth, not maximizing,alpha,beta);
         if (maximizing) 
         {
             if (val > alpha)
             {
                 alpha = val;
-                move = *it; 
+                move = (*it); 
             }
         }
         else
@@ -98,12 +99,14 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val < beta)
             {
                 beta = val;
-                move = *it;
+                move = (*it);
             }
         }
+        delete c;
     }
-    b->doMove(move, s);
-    return move;
+    Move *ans = new Move(move.x,move.y);
+    b->doMove(ans, s);
+    return ans;
 }
 
 double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, double beta)
@@ -114,66 +117,63 @@ double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, dou
     }
     if (maximizing) 
     {
-        std::vector<Move*> posMoves = getPossibleMoves(b, WHITE); 
+        std::vector<Move> posMoves = getPossibleMoves(b, WHITE); 
         if (posMoves.empty())
         {
-            std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
+            std::vector<Move> oppMoves = getPossibleMoves(b, BLACK);
             if (oppMoves.empty())
             {
                 return 1000 * (b->countWhite() - b->countBlack());
             }
             return value(b);
         }
-        //double alpha = -99999;
-        //double beta = 99999;
         double val;
-        for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+        for(std::vector<Move>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
         {
             Board *c = b->copy();
-            c->doMove(*it, WHITE);
+            c->doMove(&(*it), WHITE);
             val = alphaBeta(c, depth - 1, false, alpha, beta);
             if (val > alpha)
             {
                 alpha = val;
                 if(beta <= alpha)
                 {
+                    delete c;
                     break;
                 }
             }
             delete c;
-            delete *it;
         }
         return alpha;
     }
     else
     {
-        std::vector<Move*> posMoves = getPossibleMoves(b, BLACK);
+        std::vector<Move> posMoves = getPossibleMoves(b, BLACK);
         if (posMoves.empty())
         {
-            std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
+            std::vector<Move> oppMoves = getPossibleMoves(b, BLACK);
             if (oppMoves.empty())
             {
                 return 1000 * (b->countWhite() - b->countBlack());
             }
             return value(b);
         } 
-        //double bestValue = 100000;
         double val;
-        for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+        for(std::vector<Move>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
         {
             Board *c = b->copy();
-            c->doMove(*it, BLACK);
+            c->doMove(&(*it), BLACK);
             val = alphaBeta(c, depth - 1, true, alpha, beta);
             if (val < beta)
             {
                 beta = val;
                 if(beta <= alpha)
                 {
+                    delete c;
                     break;
                 }
             }
             delete c;
-            delete *it;
         }
         return beta;
     }
@@ -181,7 +181,7 @@ double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, dou
 
 Move *Player::mamba1(Move *opponentsMove, int msLeft)
 {
-    int depth = 4;
+    /*int depth = 4;
     bool maximizing; 
     double bestValue;
     if (s == WHITE)
@@ -233,12 +233,13 @@ Move *Player::mamba1(Move *opponentsMove, int msLeft)
         }
     }
     b->doMove(move, s);
-    return move;
+    return move;*/
+    return NULL;
 }
 
 double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
 {
-    if (depth == 0)
+    /*if (depth == 0)
     {
         return value(b); 
     }
@@ -297,7 +298,8 @@ double Player::recursiveMinMax(Board* b, int depth, bool maximizing)
             delete *it;
         }
         return bestValue;
-    }
+    }*/
+    return 0.0;
 }
 
 double Player::value(Board *boardState)
@@ -350,7 +352,7 @@ double Player::value(Board *boardState)
 
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
 {
-    Side other = (s == BLACK) ? WHITE : BLACK;
+    /*Side other = (s == BLACK) ? WHITE : BLACK;
     if(opponentsMove!=NULL)
     {
         b->doMove(opponentsMove,other);
@@ -405,7 +407,8 @@ Move *Player::doMinimax(Move *opponentsMove, int msLeft)
         i++;
     }
     b->doMove(ans,s);
-    return ans;
+    return ans;*/
+    return NULL;
 }
 
 int Player::score(Board *boardState)
@@ -421,15 +424,15 @@ int Player::score(Board *boardState)
     }
 }
 
-std::vector<Move*> Player::getPossibleMoves(Board *boardState,Side side)
+std::vector<Move> Player::getPossibleMoves(Board *boardState,Side side)
 {
-    std::vector<Move*> posMoves = std::vector<Move*>();
+    std::vector<Move> posMoves = std::vector<Move>();
     for (int i = 0; i < 8; i++) 
     {
         for (int j = 0; j < 8; j++) 
         {
-            Move *move = new Move(i, j);
-            if (boardState->checkMove(move, side))
+            Move move = Move(i, j);
+            if (boardState->checkMove(&move, side))
             {
                 posMoves.push_back(move);
             }
