@@ -55,7 +55,128 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         b->setBoard(data);
         return doMinimax(opponentsMove, msLeft);
     }
-    return mamba1(opponentsMove, msLeft);
+    return mamba1alphaBeta(opponentsMove, msLeft);
+}
+
+Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
+{
+    int depth = 5;
+    bool maximizing = (s==WHITE); 
+    double alpha = -99999;
+    double beta = 99999;
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        b->doMove(opponentsMove,other);
+    }
+    std::vector<Move*> posMoves = getPossibleMoves(b,s);
+    if(posMoves.empty())
+    {
+        return NULL;
+    }
+    if(posMoves.size() == 1)
+    {
+        b->doMove(posMoves[0], s);
+        return posMoves[0];
+    }
+    Move *move;
+    for(std::vector<Move*>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
+    {
+        Board *c = b->copy();
+        c->doMove(*it, s);
+        double val = alphaBeta(c, depth, not maximizing,alpha,beta);
+        if (maximizing) 
+        {
+            if (val > alpha)
+            {
+                alpha = val;
+                move = *it; 
+            }
+        }
+        else
+        {
+            if (val < beta)
+            {
+                beta = val;
+                move = *it;
+            }
+        }
+    }
+    b->doMove(move, s);
+    return move;
+}
+
+double Player::alphaBeta(Board* b, int depth, bool maximizing, double alpha, double beta)
+{
+    if (depth == 0)
+    {
+        return value(b); 
+    }
+    if (maximizing) 
+    {
+        std::vector<Move*> posMoves = getPossibleMoves(b, WHITE); 
+        if (posMoves.empty())
+        {
+            std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
+            if (oppMoves.empty())
+            {
+                return 1000 * (b->countWhite() - b->countBlack());
+            }
+            return value(b);
+        }
+        //double alpha = -99999;
+        //double beta = 99999;
+        double val;
+        for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+        {
+            Board *c = b->copy();
+            c->doMove(*it, WHITE);
+            val = alphaBeta(c, depth - 1, false, alpha, beta);
+            if (val > alpha)
+            {
+                alpha = val;
+                if(beta <= alpha)
+                {
+                    break;
+                }
+            }
+            delete c;
+            delete *it;
+        }
+        return alpha;
+    }
+    else
+    {
+        std::vector<Move*> posMoves = getPossibleMoves(b, BLACK);
+        if (posMoves.empty())
+        {
+            std::vector<Move*> oppMoves = getPossibleMoves(b, BLACK);
+            if (oppMoves.empty())
+            {
+                return 1000 * (b->countWhite() - b->countBlack());
+            }
+            return value(b);
+        } 
+        //double bestValue = 100000;
+        double val;
+        for(std::vector<Move*>::iterator it = posMoves.begin(); it!=posMoves.end(); ++it)
+        {
+            Board *c = b->copy();
+            c->doMove(*it, BLACK);
+            val = alphaBeta(c, depth - 1, true, alpha, beta);
+            if (val < beta)
+            {
+                beta = val;
+                if(beta <= alpha)
+                {
+                    break;
+                }
+            }
+            delete c;
+            delete *it;
+        }
+        return beta;
+    }
 }
 
 Move *Player::mamba1(Move *opponentsMove, int msLeft)
