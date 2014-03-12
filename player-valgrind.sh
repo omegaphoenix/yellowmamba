@@ -1,3 +1,3 @@
 #!/bin/bash
 
-valgrind --log-file=valgrind.log --leak-check=full ./player $*
+valgrind --log-file=valgrind.log --leak-check=full ./yellowmamba $*
