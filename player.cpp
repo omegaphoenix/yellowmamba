@@ -18,6 +18,7 @@ Player::Player(Side side)
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
+    
 }
 
 /*
@@ -60,7 +61,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
 {
-    int depth = 8;
+    int depth = 4;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;
@@ -323,14 +324,12 @@ double Player::value(Board *boardState)
     W = boardState->whiteCloseCorner(); 
     B = boardState->blackCloseCorner();
     double cornerClose = 12.5 * (B - W);
-    W = boardState->whiteEdges();
+ /*   W = boardState->whiteEdges();
     B = boardState->blackEdges();
-    double edges = 12.5 * (W - B);
-// NOTE: the mobility heuristic greatly slows computation and leads to a malloc error 
-/*   std::vector<Move*> blackMoves = getPossibleMoves(boardState, BLACK); 
-    std::vector<Move*> whiteMoves = getPossibleMoves(boardState, WHITE);
-    B = blackMoves.size();
-    W = whiteMoves.size(); 
+    double edges = 12.5 * (W - B); 
+*/   
+    B = numMoves(boardState, BLACK);
+    W = numMoves(boardState, WHITE); 
     double mobility;
     if (W == B)
     {
@@ -344,10 +343,25 @@ double Player::value(Board *boardState)
     {
         mobility = -100 * B / (B + W);
     }
-*/
-
-    return 10 * pieceDif + 801.724 * corners + 382.026 * cornerClose + 382 * edges; 
-// + 78.922 * mobility;
+    B = boardState->blackFrontierSquares();
+    W = boardState->frontierSquares() - B;
+    double frontierScore;
+    if (W == B)
+    {
+        frontierScore = 0;
+    }
+    else if (W > B)
+    {
+        frontierScore = -100 * W / (B + W);
+    }
+    else 
+    {
+        frontierScore = 100 * B / (B + W);
+    }
+    double discScore = boardState->discScore();
+    return 10 * pieceDif + 801.724 * corners + 382.026 * cornerClose
+    // + 100 * edges
+    + 78.922 * mobility + 74.396 * frontierScore + 10 * discScore;
 }
 
 Move *Player::doMinimax(Move *opponentsMove, int msLeft)
@@ -440,6 +454,24 @@ std::vector<Move> Player::getPossibleMoves(Board *boardState,Side side)
     }
     return posMoves;
 }
+
+int Player::numMoves(Board *boardState, Side side)
+{
+    int num = 0;
+    for (int i = 0; i < 8; i++) 
+    {
+        for (int j = 0; j < 8; j++) 
+        {
+            Move move = Move(i, j);
+            if (boardState->checkMove(&move, side))
+            {
+                num++;
+            }
+        }
+    }
+    return num;
+}
+
 
 Move *Player::random(Move *opponentsMove, int msLeft)
 {

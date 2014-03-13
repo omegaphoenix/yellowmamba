@@ -1,5 +1,11 @@
 #include "board.h"
 
+int disc [16] =
+    {20, -3, 11, 8,
+    -3, -7, -4, 1,
+    11, -4, 2, 2,
+    8, 1, 2, -3};
+
 /*
  * Make a standard 8x8 othello board and initialize it to the standard setup.
  */
@@ -30,6 +36,10 @@ Board *Board::copy() {
 
 bool Board::occupied(int x, int y) {
     return taken[x + 8*y];
+}
+
+bool Board::blackOccupied(int x, int y) {
+    return black[x + 8 * y]; 
 }
 
 bool Board::get(Side side, int x, int y) {
@@ -312,6 +322,161 @@ int Board::whiteEdges()
     return bitEdges(taken) - black;
 }
 
+int Board::discScore() {
+    int x, y;
+    int disks = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (occupied(i, j)) {
+                x = i;
+                y = j;
+                if (i > 3) {
+                    x = 7 - i;
+                }
+                if (j > 3) {
+                    y = 7 - j;
+                }
+                if (blackOccupied(i, j)) {
+                    disks -= disc[x + 4 * y];
+                }
+                else {
+                    disks += disc[x + 4 * y];
+                }
+            }
+        }        
+    }
+    return disks;
+}
+
+bool Board::isFrontier(int i, int j) {
+    if (occupied(i, j)) {
+        if (i == 0) {
+            if (j != 0 and j != 7) {
+                if (not occupied(i + 1, j)) {
+                    return true; 
+                }
+                else if (not occupied(i, j + 1)) {
+                    return true; 
+                }
+                else if (not occupied(i, j - 1)) {
+                    return true;
+                }
+                else if (not occupied(i + 1, j + 1)) {
+                    return true;
+                }
+                else if (not occupied(i + 1, j - 1)) {
+                    return true;
+                }
+            }
+        }
+        else if (i == 7) {
+            if (j != 0 and j != 7) {
+                if (not occupied(i - 1, j)) {
+                    return true; 
+                }
+                else if (not occupied(i, j + 1)) {
+                    return true; 
+                }
+                else if (not occupied(i, j - 1)) {
+                    return true;
+                }
+                else if (not occupied(i - 1, j + 1)) {
+                    return true;
+                }
+                else if (not occupied(i - 1, j - 1)) {
+                    return true;
+                }
+            }
+        }
+        else {
+            if (j == 0) {
+                if (not occupied(i - 1, j + 1)) {
+                    return true; 
+                }
+                else if (not occupied(i, j + 1)) {
+                    return true; 
+                }
+                else if (not occupied(i + 1, j + 1)) {
+                    return true;
+                }
+                else if (not occupied(i - 1, j)) {
+                    return true;
+                }
+                else if (not occupied(i + 1, j)) {
+                    return true;
+                }
+            }
+            else if (j == 7) {
+	        if (not occupied(i - 1, j - 1)) {
+                    return true; 
+                }
+                else if (not occupied(i, j - 1)) {
+                    return true; 
+                }
+                else if (not occupied(i + 1, j - 1)) {
+                    return true;
+                }
+                else if (not occupied(i - 1, j)) {
+                    return true;
+                }
+                else if (not occupied(i + 1, j)) {
+                    return true;
+                }
+            }
+            else {
+                if (not occupied(i - 1, j - 1)) {
+                    return true; 
+                }
+                else if (not occupied(i, j - 1)) {
+                    return true; 
+                }
+                else if (not occupied(i + 1, j - 1)) {
+                    return true;
+                }
+                else if (not occupied(i - 1, j)) {
+                    return true;
+                }
+                else if (not occupied(i + 1, j)) {
+                    return true;
+                }
+                else if (not occupied(i - 1, j + 1)) {
+                    return true; 
+                }
+                else if (not occupied(i, j + 1)) {
+                    return true; 
+                }
+                else if (not occupied(i + 1, j + 1)) {
+                    return true;
+                }
+            }
+        }   
+    }
+    return false;
+}
+
+int Board::frontierSquares() {
+    int ans = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (isFrontier(i, j)) {
+                ans++;
+            }
+        }
+    }
+    return ans;
+}
+
+int Board::blackFrontierSquares() {
+    int ans = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (isFrontier(i, j) and blackOccupied(i, j)) {
+                ans++;
+            }
+        }
+    }
+    return ans;
+}
 
 /*
  * Sets the board state given an 8x8 char array where 'w' indicates a white

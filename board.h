@@ -12,6 +12,7 @@ private:
     bitset<64> taken;    
        
     bool occupied(int x, int y);
+    bool blackOccupied(int x, int y);
     bool get(Side side, int x, int y);
     void set(Side side, int x, int y);
     bool onBoard(int x, int y);
@@ -37,6 +38,10 @@ public:
     int bitEdges(bitset<64> bit);
     int blackEdges();
     int whiteEdges();
+    int discScore();
+    bool isFrontier(int i, int j);
+    int frontierSquares(); 
+    int blackFrontierSquares();
     void setBoard(char data[]);
 };
 
