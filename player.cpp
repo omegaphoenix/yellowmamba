@@ -80,7 +80,7 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
         Move *ans = new Move(posMoves[0].x,posMoves[0].y);
         return ans;
     }
-    Move move(0,0);
+    Move move(posMoves[0].x,posMoves[0].y);
     for(std::vector<Move>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
     {
         Board *c = b->copy();
