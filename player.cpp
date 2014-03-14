@@ -61,7 +61,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
 {
-    int depth = 4;
+    int depth = 6;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;
@@ -324,10 +324,9 @@ double Player::value(Board *boardState)
     W = boardState->whiteCloseCorner(); 
     B = boardState->blackCloseCorner();
     double cornerClose = 12.5 * (B - W);
- /*   W = boardState->whiteEdges();
+    W = boardState->whiteEdges();
     B = boardState->blackEdges();
-    double edges = 12.5 * (W - B); 
-*/   
+    double edges = 12.5 * (W - B);  
     B = numMoves(boardState, BLACK);
     W = numMoves(boardState, WHITE); 
     double mobility;
@@ -360,7 +359,7 @@ double Player::value(Board *boardState)
     }
     double discScore = boardState->discScore();
     return 10 * pieceDif + 801.724 * corners + 382.026 * cornerClose
-    // + 100 * edges
+     + 380 * edges
     + 78.922 * mobility + 74.396 * frontierScore + 10 * discScore;
 }
 
