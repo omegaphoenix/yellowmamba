@@ -18,7 +18,7 @@ Player::Player(Side side)
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
-    
+d    
 }
 
 /*
@@ -61,7 +61,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
 {
-    int depth = 4;
+    int depth = 6;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;

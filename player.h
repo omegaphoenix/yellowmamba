@@ -5,6 +5,7 @@
 #include <vector>
 #include "common.h"
 #include "board.h"
+#include <unordered_map>
 using namespace std;
 
 class Player {
@@ -25,9 +26,10 @@ public:
     int numMoves(Board *boardState, Side side);
     Move *random(Move *opponentsMove, int msLeft);
     Move *heuristic(Move *opponentsMove, int msLeft);
-
+    std::unordered_map<Board, MoveDepth> transTable;
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
+    
 };
 
 #endif
