@@ -18,7 +18,6 @@ Player::Player(Side side)
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
-d    
 }
 
 /*
@@ -56,12 +55,75 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         b->setBoard(data);
         return doMinimax(opponentsMove, msLeft);
     }
-    return mamba1alphaBeta(opponentsMove, msLeft);
+    return iterativeDeepening(opponentsMove, msLeft);
+}
+
+Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
+{
+    int depth = 4;
+    bool maximizing = (s==WHITE); 
+    double alpha = -99999;
+    double beta = 99999;
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        b->doMove(opponentsMove,other);
+    }
+    std::vector<Move> posMoves = getPossibleMoves(b,s);
+    if(posMoves.empty())
+    {
+        return NULL;
+    }
+    if(posMoves.size() == 1)
+    {
+        b->doMove(&posMoves[0], s);
+        Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+        return ans;
+    }
+    Move move(posMoves[0].x,posMoves[0].y);
+    for(int i = 3; i<depth; i++)
+    {
+        for(std::vector<Move>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
+        {
+            Board *c = b->copy();
+            c->doMove(&(*it), s);
+            double val = alphaBeta(c, i+1, not maximizing,alpha,beta);
+            if (maximizing) 
+            {
+                if (val > alpha)
+                {
+                    alpha = val;
+                    move = (*it);
+                }
+            }
+            else
+            {
+                if (val < beta)
+                {
+                    beta = val;
+                    move = (*it);
+                }
+            }
+            delete c;
+        }
+        MoveDepth temp(move.x,move.y,i+1);
+        if(i%2==0)
+        {
+            bestMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
+        }
+        else
+        {
+            worstMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
+        }
+    }
+    Move *ans = new Move(move.x,move.y);
+    b->doMove(ans, s);
+    return ans;
 }
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
 {
-    int depth = 6;
+    int depth = 4;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;
@@ -92,7 +154,7 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val > alpha)
             {
                 alpha = val;
-                move = (*it); 
+                move = (*it);
             }
         }
         else

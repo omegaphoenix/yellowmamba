@@ -22,11 +22,14 @@ public:
     void setY(int y) { this->y = y; }
 };
 
-class MoveDepth
+class MoveDepth : public Move
 {
 public:
-    Move m;
-    double depth;
+    int depth;
+    MoveDepth(int x, int y, int deep) : Move(x,y)
+    {
+        depth = deep;
+    }
 };
 
 #endif

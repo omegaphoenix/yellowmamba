@@ -5,7 +5,7 @@
 #include <vector>
 #include "common.h"
 #include "board.h"
-#include <unordered_map>
+#include <map>
 using namespace std;
 
 class Player {
@@ -15,6 +15,7 @@ public:
     ~Player();
     
     Move *doMove(Move *opponentsMove, int msLeft);
+    Move *iterativeDeepening(Move *opponentsMove, int msLeft);
     double alphaBeta(Board *b, int depth, bool maximizing, double alpha, double beta);
     Move *mamba1(Move *opponentsMove, int msLeft);
     Move *mamba1alphaBeta(Move *opponentsMove, int msLeft);
@@ -26,7 +27,8 @@ public:
     int numMoves(Board *boardState, Side side);
     Move *random(Move *opponentsMove, int msLeft);
     Move *heuristic(Move *opponentsMove, int msLeft);
-    std::unordered_map<Board, MoveDepth> transTable;
+    std::map<Board*, MoveDepth> bestMoveTable;
+    std::map<Board*, MoveDepth> worstMoveTable;
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
     
