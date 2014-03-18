@@ -494,3 +494,8 @@ void Board::setBoard(char data[]) {
         }
     }
 }
+
+int Board::movesLeft()
+{
+    return taken.count();
+}

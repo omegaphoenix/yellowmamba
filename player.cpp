@@ -1,7 +1,9 @@
 #include "player.h"
 #include "stdio.h"
+#include <sys/time.h>
 Board *b;
 Side s;
+static struct timeval start_time;
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
@@ -18,7 +20,6 @@ Player::Player(Side side)
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
-    
 }
 
 /*
@@ -56,7 +57,131 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
         b->setBoard(data);
         return doMinimax(opponentsMove, msLeft);
     }
-    return mamba1alphaBeta(opponentsMove, msLeft);
+    return iterativeDeepening(opponentsMove, msLeft);
+}
+
+Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
+{
+    gettimeofday(&start_time,NULL);
+    struct timeval t;
+    int depth = 9;
+    bool maximizing = (s==WHITE); 
+    double alpha = -99999;
+    double beta = 99999;
+    Side other = (s == BLACK) ? WHITE : BLACK;
+    if(opponentsMove!=NULL)
+    {
+        b->doMove(opponentsMove,other);
+    }
+    std::vector<Move> posMoves = getPossibleMoves(b,s);
+    std::vector<double> valueTrack;
+    if(posMoves.empty())
+    {
+        return NULL;
+    }
+    if(posMoves.size() == 1)
+    {
+        b->doMove(&posMoves[0], s);
+        Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+        return ans;
+    }
+    Move move(posMoves[0].x,posMoves[0].y);
+    for(int i = 3; i<depth; i++)
+    {
+        alpha = -99999;
+        beta = 99999;
+        for(std::vector<Move>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
+        {
+            gettimeofday(&t,NULL);
+            if(((t.tv_sec - start_time.tv_sec)*1000000 + t.tv_usec-start_time.tv_usec)/1000.0>msLeft/(b->movesLeft()))
+            {
+                Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+                b->doMove(ans,s);
+                std::cerr << i << endl;
+                return ans;
+            }
+            Board *c = b->copy();
+            c->doMove(&(*it), s);
+            double val = alphaBeta(c, i+1, not maximizing,alpha,beta);
+            valueTrack.push_back(val);
+            if (maximizing) 
+            {
+                if (val > alpha)
+                {
+                    alpha = val;
+                    move = (*it);
+                }
+            }
+            else
+            {
+                if (val < beta)
+                {
+                    beta = val;
+                    move = (*it);
+                }
+            }
+            delete c;
+        }
+        /*for(int y = 0; y<valueTrack.size(); y++)
+        {
+            std::cerr << valueTrack[y] << " ";
+        }
+        std::cerr << "\n";*/
+        if(maximizing)
+        {
+            for(unsigned int k = 1; k <posMoves.size(); k++)
+            {
+                int j=k;
+                double temp = valueTrack[k];
+                Move tempMove = posMoves[k];
+                while(j>0 && valueTrack[j-1] < temp)
+                {
+                    valueTrack[j] = valueTrack[j-1];
+                    posMoves[j] = posMoves[j-1];
+                    j--;
+                }
+                valueTrack[j] = temp;
+                posMoves[j] = tempMove;
+            }
+        }
+        else
+        {
+            for(unsigned int k = 1; k <posMoves.size(); k++)
+            {
+                int j=k;
+                double temp = valueTrack[k];
+                Move tempMove = posMoves[k];
+                while(j>0 && valueTrack[j-1] > temp)
+                {
+                    valueTrack[j] = valueTrack[j-1];
+                    posMoves[j] = posMoves[j-1];
+                    j--;
+                }
+                valueTrack[j] = temp;
+                posMoves[j] = tempMove;
+            }
+        }
+        /*for(int y = 0; y<valueTrack.size(); y++)
+        {
+            std::cerr << valueTrack[y] << " ";
+        }
+        std::cerr << "\n";*/
+        valueTrack.clear();
+        MoveDepth temp(posMoves[0].x,posMoves[0].y,i+1);
+        if(i%2==0)
+        {
+            bestMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
+        }
+        else
+        {
+            worstMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
+        }
+    }
+    bestMoveTable.clear();
+    worstMoveTable.clear();
+    Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+    b->doMove(ans, s);
+    return ans;
 }
 
 Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
@@ -92,7 +217,7 @@ Move *Player::mamba1alphaBeta(Move *opponentsMove, int msLeft)
             if (val > alpha)
             {
                 alpha = val;
-                move = (*it); 
+                move = (*it);
             }
         }
         else

@@ -43,6 +43,7 @@ public:
     int frontierSquares(); 
     int blackFrontierSquares();
     void setBoard(char data[]);
+    int movesLeft();
 };
 
 #endif
