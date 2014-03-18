@@ -27,8 +27,6 @@ public:
     int numMoves(Board *boardState, Side side);
     Move *random(Move *opponentsMove, int msLeft);
     Move *heuristic(Move *opponentsMove, int msLeft);
-    std::map<Board*, MoveDepth> bestMoveTable;
-    std::map<Board*, MoveDepth> worstMoveTable;
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
     

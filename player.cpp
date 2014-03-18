@@ -122,11 +122,6 @@ Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
             }
             delete c;
         }
-        /*for(int y = 0; y<valueTrack.size(); y++)
-        {
-            std::cerr << valueTrack[y] << " ";
-        }
-        std::cerr << "\n";*/
         if(maximizing)
         {
             for(unsigned int k = 1; k <posMoves.size(); k++)
@@ -161,24 +156,8 @@ Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
                 posMoves[j] = tempMove;
             }
         }
-        /*for(int y = 0; y<valueTrack.size(); y++)
-        {
-            std::cerr << valueTrack[y] << " ";
-        }
-        std::cerr << "\n";*/
         valueTrack.clear();
-        MoveDepth temp(posMoves[0].x,posMoves[0].y,i+1);
-        if(i%2==0)
-        {
-            bestMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
-        }
-        else
-        {
-            worstMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
-        }
     }
-    bestMoveTable.clear();
-    worstMoveTable.clear();
     Move *ans = new Move(posMoves[0].x,posMoves[0].y);
     b->doMove(ans, s);
     return ans;
