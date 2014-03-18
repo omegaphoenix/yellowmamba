@@ -1,7 +1,9 @@
 #include "player.h"
 #include "stdio.h"
+#include <sys/time.h>
 Board *b;
 Side s;
+static struct timeval start_time;
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
@@ -60,7 +62,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
 Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
 {
-    int depth = 6;
+    gettimeofday(&start_time,NULL);
+    struct timeval t;
+    int depth = 9;
     bool maximizing = (s==WHITE); 
     double alpha = -99999;
     double beta = 99999;
@@ -82,12 +86,20 @@ Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
         return ans;
     }
     Move move(posMoves[0].x,posMoves[0].y);
-    for(int i = 5; i<depth; i++)
+    for(int i = 3; i<depth; i++)
     {
         alpha = -99999;
         beta = 99999;
         for(std::vector<Move>::iterator it = posMoves.begin(); it != posMoves.end(); ++it)
         {
+            gettimeofday(&t,NULL);
+            if(((t.tv_sec - start_time.tv_sec)*1000000 + t.tv_usec-start_time.tv_usec)/1000.0>msLeft/(b->movesLeft()))
+            {
+                Move *ans = new Move(posMoves[0].x,posMoves[0].y);
+                b->doMove(ans,s);
+                std::cerr << i << endl;
+                return ans;
+            }
             Board *c = b->copy();
             c->doMove(&(*it), s);
             double val = alphaBeta(c, i+1, not maximizing,alpha,beta);
@@ -110,11 +122,11 @@ Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
             }
             delete c;
         }
-        for(int i = 0; i<valueTrack.size(); i++)
+        /*for(int y = 0; y<valueTrack.size(); y++)
         {
-            std::cerr << valueTrack[i] << " ";
+            std::cerr << valueTrack[y] << " ";
         }
-        std::cerr << "\n";
+        std::cerr << "\n";*/
         if(maximizing)
         {
             for(unsigned int k = 1; k <posMoves.size(); k++)
@@ -149,16 +161,15 @@ Move *Player::iterativeDeepening(Move *opponentsMove, int msLeft)
                 posMoves[j] = tempMove;
             }
         }
-        for(int i = 0; i<valueTrack.size(); i++)
+        /*for(int y = 0; y<valueTrack.size(); y++)
         {
-            std::cerr << valueTrack[i] << " ";
+            std::cerr << valueTrack[y] << " ";
         }
-        std::cerr << "\n";
+        std::cerr << "\n";*/
         valueTrack.clear();
         MoveDepth temp(posMoves[0].x,posMoves[0].y,i+1);
         if(i%2==0)
         {
-            
             bestMoveTable.insert(std::pair<Board*,MoveDepth>(b,temp));
         }
         else
